@@ -1,0 +1,374 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+:root {
+  --bg-color: hsl(220, 18%, 7%);
+  --bg-radial: radial-gradient(circle at 50% 0%, hsl(262, 47%, 14%) 0%, hsl(220, 18%, 7%) 70%);
+  --card-bg: hsla(220, 12%, 14%, 0.55);
+  --card-bg-hover: hsla(220, 12%, 18%, 0.7);
+  --border-color: hsla(220, 20%, 30%, 0.18);
+  --border-glow: hsla(260, 85%, 65%, 0.4);
+  
+  --text-primary: hsl(210, 15%, 95%);
+  --text-secondary: hsl(215, 12%, 70%);
+  --text-muted: hsl(215, 10%, 45%);
+  
+  --primary-glow: linear-gradient(135deg, hsl(260, 85%, 60%) 0%, hsl(285, 90%, 55%) 100%);
+  --primary-accent: hsl(260, 85%, 60%);
+  --primary-accent-hover: hsl(260, 85%, 68%);
+  
+  --success: hsl(145, 80%, 45%);
+  --success-bg: hsla(145, 80%, 45%, 0.15);
+  --warning: hsl(38, 92%, 55%);
+  --warning-bg: hsla(38, 92%, 55%, 0.15);
+  --danger: hsl(355, 85%, 55%);
+  --danger-bg: hsla(355, 85%, 55%, 0.15);
+  --info: hsl(199, 89%, 48%);
+  --info-bg: hsla(199, 89%, 48%, 0.15);
+  
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-mono: 'Fira Code', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  background-image: var(--bg-radial);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsla(220, 18%, 7%, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsla(220, 20%, 30%, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsla(260, 85%, 60%, 0.5);
+}
+
+/* Typography elements */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+a {
+  color: var(--primary-accent);
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+a:hover {
+  color: var(--primary-accent-hover);
+  text-shadow: 0 0 8px hsla(260, 85%, 60%, 0.4);
+}
+
+/* Premium Layout utility classes */
+.glass-panel {
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: var(--transition-smooth);
+}
+
+.glass-panel:hover {
+  border-color: hsla(220, 20%, 30%, 0.3);
+}
+
+.glass-panel-glow {
+  background: var(--card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition-smooth);
+}
+
+.glass-panel-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary-glow);
+  opacity: 0.7;
+}
+
+/* Animated node pulses */
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(147, 51, 234, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(147, 51, 234, 0);
+  }
+}
+
+.node-pulse-active {
+  animation: pulse-glow 2s infinite;
+  border-color: var(--primary-accent) !important;
+}
+
+/* Status badges styling */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid transparent;
+}
+
+.badge-pending {
+  background: hsla(215, 10%, 45%, 0.15);
+  border-color: hsla(215, 10%, 45%, 0.25);
+  color: var(--text-secondary);
+}
+
+.badge-running {
+  background: var(--info-bg);
+  border-color: hsla(199, 89%, 48%, 0.3);
+  color: var(--info);
+  animation: pulse-glow 2s infinite;
+}
+
+.badge-paused {
+  background: var(--warning-bg);
+  border-color: hsla(38, 92%, 55%, 0.3);
+  color: var(--warning);
+}
+
+.badge-completed {
+  background: var(--success-bg);
+  border-color: hsla(145, 80%, 45%, 0.3);
+  color: var(--success);
+}
+
+.badge-failed {
+  background: var(--danger-bg);
+  border-color: hsla(355, 85%, 55%, 0.3);
+  color: var(--danger);
+}
+
+/* Terminal Log Panel */
+.terminal-window {
+  background: hsl(220, 20%, 5%);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: hsl(120, 60%, 75%);
+  overflow-y: auto;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+/* Common form inputs */
+.form-input {
+  width: 100%;
+  background: hsla(220, 15%, 8%, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  padding: 14px 18px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.form-input:focus {
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 12px hsla(260, 85%, 60%, 0.25);
+}
+
+.form-button {
+  background: var(--primary-glow);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 28px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px 0 hsla(260, 85%, 60%, 0.4);
+}
+
+.form-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 hsla(260, 85%, 60%, 0.6);
+  opacity: 0.95;
+}
+
+.form-button:active {
+  transform: translateY(0);
+}
+
+.form-button-secondary {
+  background: hsla(220, 15%, 20%, 0.5);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 12px;
+  padding: 14px 28px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.form-button-secondary:hover {
+  background: hsla(220, 15%, 25%, 0.7);
+  border-color: var(--text-secondary);
+}
+
+/* Markdown Rendering Clean CSS Style */
+.markdown-body {
+  line-height: 1.7;
+}
+
+.markdown-body h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.markdown-body h2 {
+  font-size: 1.4rem;
+  margin-top: 1.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.markdown-body h3 {
+  font-size: 1.15rem;
+  margin-top: 1.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.markdown-body p {
+  margin-bottom: 1.1rem;
+  color: var(--text-secondary);
+}
+
+.markdown-body ul, .markdown-body ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1.2rem;
+  color: var(--text-secondary);
+}
+
+.markdown-body li {
+  margin-bottom: 0.4rem;
+}
+
+.markdown-body code {
+  font-family: var(--font-mono);
+  background: hsla(220, 15%, 8%, 0.7);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: hsl(300, 60%, 75%);
+}
+
+.markdown-body pre {
+  background: hsla(220, 15%, 5%, 0.9);
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.2rem;
+}
+
+.markdown-body pre code {
+  background: transparent;
+  padding: 0;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.4rem;
+}
+
+.markdown-body th, .markdown-body td {
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  text-align: left;
+}
+
+.markdown-body th {
+  background: hsla(220, 12%, 18%, 0.6);
+  font-weight: 600;
+}
+
+.markdown-body tr:nth-child(even) {
+  background: hsla(220, 12%, 14%, 0.3);
+}
+
+.markdown-body blockquote {
+  border-left: 4px solid var(--primary-accent);
+  padding-left: 16px;
+  margin-bottom: 1.2rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Spinner and Slide-In keyframes */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
