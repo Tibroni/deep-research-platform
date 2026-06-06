@@ -25,6 +25,8 @@ class Settings(BaseSettings):
 
     # Comma-separated list of allowed browser origins for CORS
     CORS_ORIGINS: str = "http://localhost:3000"
+    # Regex for preview/production hosts (e.g. *.vercel.app). Set empty to disable.
+    CORS_ORIGIN_REGEX: str = r"https://.*\.vercel\.app"
 
     # Fallback to local SQLite when DATABASE_URL is not set
     SQLITE_URL: str = f"sqlite+aiosqlite:///{BASE_DIR}/deep_research.db"
@@ -56,7 +58,16 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins(self) -> list[str]:
-        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+        return [
+            origin.strip().rstrip("/")
+            for origin in self.CORS_ORIGINS.split(",")
+            if origin.strip()
+        ]
+
+    @property
+    def cors_origin_regex(self) -> Optional[str]:
+        value = self.CORS_ORIGIN_REGEX.strip()
+        return value or None
 
 # Instantiate settings
 settings = Settings()
