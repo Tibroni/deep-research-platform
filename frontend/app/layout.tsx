@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import GrainOverlay from "@/components/GrainOverlay";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Deep Research Platform | Multi-Agent Orchestrator",
-  description: "Durable multi-agent research workflow engine built with LangGraph, FastAPI, and Next.js.",
+  title: "Deep Research Platform",
+  description: "Multi-agent research with web search, fact checking, and human approval gates.",
 };
 
 export default function RootLayout({
@@ -14,7 +15,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <main style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        <GrainOverlay />
+        <main style={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", zIndex: 1 }}>
           {children}
         </main>
       </body>

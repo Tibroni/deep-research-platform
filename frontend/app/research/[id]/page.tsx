@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
+import AppNav from "@/components/AppNav";
+import { getApiBase, getWsBase } from "@/lib/config";
 
 interface PlanItem {
   id: number;
@@ -46,8 +48,8 @@ export default function ResearchWorkspace() {
 
   const consoleEndRef = useRef<HTMLDivElement>(null);
 
-  const API_BASE = "http://localhost:8000/api";
-  const WS_BASE = "ws://localhost:8000/ws";
+  const API_BASE = getApiBase();
+  const WS_BASE = getWsBase();
 
   // Fetch initial details
   const fetchJobDetails = async () => {
@@ -232,12 +234,12 @@ export default function ResearchWorkspace() {
             color = "var(--success)";
             borderColor = "var(--success)";
           } else if (state === "active") {
-            color = "var(--info)";
-            borderColor = "var(--info)";
+            color = "var(--primary-accent)";
+            borderColor = "var(--primary-accent)";
             pulseClass = "node-pulse-active";
           } else if (state === "paused") {
-            color = "var(--warning)";
-            borderColor = "var(--warning)";
+            color = "var(--primary-accent)";
+            borderColor = "var(--primary-accent)";
             pulseClass = "node-pulse-active";
           } else if (state === "failed") {
             color = "var(--danger)";
@@ -261,7 +263,7 @@ export default function ResearchWorkspace() {
                     fontWeight: 700,
                     fontSize: "0.85rem",
                     color: color,
-                    background: "hsl(220, 20%, 8%)",
+                    background: "var(--ds-zinc-950)",
                     transition: "var(--transition-smooth)",
                   }}
                 >
@@ -345,7 +347,7 @@ export default function ResearchWorkspace() {
             <div key={`table-container-${keyPrefix}`} style={{ overflowX: "auto", marginBottom: "20px" }}>
               <table style={{ width: "100%", borderCollapse: "collapse", margin: "10px 0" }}>
                 <thead>
-                  <tr style={{ background: "hsla(220, 12%, 18%, 0.6)" }}>
+                  <tr style={{ background: "var(--ds-zinc-900)" }}>
                     {header.map((col, cidx) => (
                       <th key={`th-${keyPrefix}-${cidx}`} style={{ padding: "10px 14px", border: "1px solid var(--border-color)", textAlign: "left", fontWeight: 600 }}>
                         {parseInlineText(col)}
@@ -355,7 +357,7 @@ export default function ResearchWorkspace() {
                 </thead>
                 <tbody>
                   {body.map((row, ridx) => (
-                    <tr key={`tr-${keyPrefix}-${ridx}`} style={{ background: ridx % 2 === 1 ? "hsla(220, 12%, 14%, 0.3)" : "transparent" }}>
+                    <tr key={`tr-${keyPrefix}-${ridx}`} style={{ background: ridx % 2 === 1 ? "rgba(255,255,255,0.02)" : "transparent" }}>
                       {row.map((col, cidx) => (
                         <td key={`td-${keyPrefix}-${ridx}-${cidx}`} style={{ padding: "10px 14px", border: "1px solid var(--border-color)", color: "var(--text-secondary)" }}>
                           {parseInlineText(col)}
@@ -410,16 +412,7 @@ export default function ResearchWorkspace() {
                 e.preventDefault();
                 setSelectedSource(targetSource);
               }}
-              style={{
-                background: "hsla(260, 85%, 60%, 0.12)",
-                padding: "2px 8px",
-                borderRadius: "4px",
-                border: "1px solid hsla(260, 85%, 60%, 0.25)",
-                fontSize: "0.85em",
-                fontWeight: 600,
-                color: "hsl(260, 85%, 70%)",
-                margin: "0 2px"
-              }}
+              className="citation-link"
             >
               [{sourceId}]
             </a>
@@ -502,64 +495,35 @@ export default function ResearchWorkspace() {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden" }}>
-      {/* Top Navbar */}
-      <nav style={{ height: "64px", borderBottom: "1px solid var(--border-color)", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "hsla(220, 15%, 8%, 0.8)", backdropFilter: "blur(8px)", zIndex: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <button 
-            onClick={() => router.push("/")}
-            className="form-button-secondary"
-            style={{ padding: "6px 14px", fontSize: "0.85rem", height: "32px" }}
-          >
-            ← Dashboard
-          </button>
-          <h2 style={{ fontSize: "1.2rem", fontWeight: 700 }}>Workspace: {title || "Investigation"}</h2>
-        </div>
-        
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <span style={{ fontSize: "0.85rem", color: connected ? "var(--success)" : "var(--danger)", display: "flex", alignItems: "center", gap: "6px" }}>
-            <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: connected ? "var(--success)" : "var(--danger)" }} />
-            {connected ? "Live Stream Active" : "Disconnected"}
-          </span>
-          <span className={`badge ${status === "completed" ? "badge-completed" : (status === "executing" ? "badge-running" : "badge-paused")}`}>
-            {status.replace(/_/g, " ")}
-          </span>
-        </div>
-      </nav>
+    <div className="workspace">
+      <AppNav
+        title={title || "Investigation"}
+        trailing={
+          <>
+            <span className="workspace__status">
+              <span className={`workspace__status-dot ${connected ? "workspace__status-dot--live" : "workspace__status-dot--off"}`} />
+              {connected ? "Live" : "Offline"}
+            </span>
+            <span className={`badge ${status === "completed" ? "badge-completed" : status === "executing" ? "badge-running" : "badge-paused"}`}>
+              {status.replace(/_/g, " ")}
+            </span>
+          </>
+        }
+      />
 
-      {/* Split Pane Work Area */}
-      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-        
-        {/* Left Side: Monitor Node Graph + Console logs */}
-        <div style={{ width: "40%", minWidth: "400px", borderRight: "1px solid var(--border-color)", display: "flex", flexDirection: "column", padding: "24px", background: "hsla(220, 15%, 6%, 0.35)", overflowY: "auto" }}>
-          
-          <h3 style={{ fontSize: "1.1rem", marginBottom: "16px", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-muted)" }}>
-            Agent Graph Orchestrator
-          </h3>
-          
+      <div className="workspace__split">
+        <div className="workspace__sidebar">
+          <p className="workspace__section-label">Agent graph</p>
           {renderFlowGraph()}
-          
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-            <h3 style={{ fontSize: "1.1rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-muted)" }}>
-              Live Console Output
-            </h3>
-            <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
-              lines: {logs.length}
+
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem", marginTop: "1.5rem" }}>
+            <p className="workspace__section-label" style={{ marginBottom: 0 }}>Console</p>
+            <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>
+              {logs.length} lines
             </span>
           </div>
 
-          <div 
-            className="terminal-window" 
-            style={{ 
-              flex: 1, 
-              padding: "16px", 
-              minHeight: "250px",
-              maxHeight: "60vh",
-              display: "flex", 
-              flexDirection: "column", 
-              gap: "8px" 
-            }}
-          >
+          <div className="terminal-window" style={{ flex: 1, padding: "1rem", minHeight: "200px", maxHeight: "50vh", display: "flex", flexDirection: "column", gap: "6px" }}>
             {logs.map((log, idx) => (
               <div 
                 key={idx} 
@@ -574,29 +538,23 @@ export default function ResearchWorkspace() {
           </div>
         </div>
 
-        {/* Right Side: Investigation Workboard */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
-          
-          {/* Main Workspace Frame */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "32px 40px" }}>
+        <div className="workspace__main">
+          <div className="workspace__content">
             
             {/* 1. Planning interruption phase */}
             {status === "awaiting_plan_approval" && (
-              <div className="glass-panel" style={{ borderLeft: "4px solid var(--warning)" }}>
-                <h2 style={{ fontSize: "1.6rem", color: "var(--warning)", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
-                  ⚠️ Research Plan Verification Required
-                </h2>
-                <p style={{ color: "var(--text-secondary)", marginBottom: "24px" }}>
-                  The Planner Agent has formulated a research draft outline. Please review the topics and queries below. You can modify search keywords directly in the fields before approving the execution.
+              <div className="glass-panel workspace__alert">
+                <h2>Plan approval required</h2>
+                <p>
+                  The Planner agent has proposed a research outline. Review the topics and
+                  queries below. You can edit search keywords before approving.
                 </p>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "30px" }}>
                   {plan.map((item, idx) => (
-                    <div key={item.id} className="glass-panel" style={{ padding: "16px", background: "hsla(220, 15%, 8%, 0.3)" }}>
+                    <div key={item.id} className="glass-panel" style={{ padding: "1rem", background: "var(--ds-zinc-950)" }}>
                       <div style={{ display: "flex", gap: "10px", alignItems: "center", marginBottom: "8px" }}>
-                        <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--primary-accent)", background: "hsla(260, 85%, 60%, 0.1)", width: "24px", height: "24px", borderRadius: "50%", display: "inline-flex", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
-                          {item.id}
-                        </span>
+                        <span className="workspace__plan-num">{item.id}</span>
                         <input
                           className="form-input"
                           style={{ padding: "8px 12px", fontSize: "0.95rem", flex: 1 }}
@@ -650,8 +608,7 @@ export default function ResearchWorkspace() {
                     </button>
                     
                     <button
-                      className="form-button-secondary"
-                      style={{ color: "var(--danger)", borderColor: "hsla(355, 85%, 55%, 0.3)" }}
+                      className="form-button-secondary form-button-secondary--danger"
                       disabled={submittingDecision || !feedback.trim()}
                       onClick={() => handleApprovePlan(false)}
                     >
@@ -664,13 +621,12 @@ export default function ResearchWorkspace() {
 
             {/* 2. Review report draft interruption phase */}
             {status === "awaiting_final_approval" && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-                <div className="glass-panel" style={{ borderLeft: "4px solid var(--warning)", background: "hsla(38, 92%, 55%, 0.05)" }}>
-                  <h2 style={{ fontSize: "1.5rem", color: "var(--warning)", marginBottom: "8px" }}>
-                    ⚠️ Editorial Verification Required
-                  </h2>
-                  <p style={{ color: "var(--text-secondary)", marginBottom: "16px" }}>
-                    The Writer Agent has composed the draft report and the Fact Checker has audited the claims. Please review the investigation paper below.
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                <div className="glass-panel workspace__alert">
+                  <h2>Report approval required</h2>
+                  <p>
+                    The Writer has drafted the report and the Fact Checker has audited
+                    the claims. Review the draft below.
                   </p>
                   
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px", borderTop: "1px solid var(--border-color)", paddingTop: "16px" }}>
@@ -685,14 +641,14 @@ export default function ResearchWorkspace() {
                       <button className="form-button" onClick={() => handleApproveReport(true)} disabled={submittingDecision}>
                         {submittingDecision ? "Approving..." : "✓ Approve & Finalize Report"}
                       </button>
-                      <button className="form-button-secondary" style={{ color: "var(--danger)", borderColor: "hsla(355, 85%, 55%, 0.2)" }} onClick={() => handleApproveReport(false)} disabled={submittingDecision || !feedback.trim()}>
+                      <button className="form-button-secondary form-button-secondary--danger" onClick={() => handleApproveReport(false)} disabled={submittingDecision || !feedback.trim()}>
                         {submittingDecision ? "Submitting..." : "✗ Request Modifications"}
                       </button>
                     </div>
                   </div>
                 </div>
 
-                <div className="glass-panel" style={{ padding: "40px", background: "hsla(220, 12%, 14%, 0.25)" }}>
+                <div className="glass-panel" style={{ padding: "2.5rem" }}>
                   {renderMarkdownWithCitations(draftReport)}
                 </div>
               </div>
@@ -700,44 +656,33 @@ export default function ResearchWorkspace() {
 
             {/* 3. Executing/Running placeholder */}
             {(status === "planning" || status === "executing") && (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 20px", height: "100%", gap: "24px", textAlign: "center" }}>
-                <div style={{ 
-                  width: "64px", 
-                  height: "64px", 
-                  borderRadius: "50%", 
-                  border: "4px solid var(--border-color)",
-                  borderTopColor: "var(--primary-accent)",
-                  animation: "spin 1.5s linear infinite"
-                }} />
-                
+              <div className="workspace__empty-state">
+                <div className="workspace__spinner" />
                 <div>
-                  <h2 style={{ fontSize: "1.8rem", marginBottom: "8px", fontWeight: 700 }}>Agent Team at Work</h2>
-                  <p style={{ color: "var(--text-secondary)", maxWidth: "500px" }}>
-                    The multi-agent coordinator is managing plan drafts, search engines, fact sheets, and writers. Watch the log output on the left for active status updates.
+                  <h2>Agents running</h2>
+                  <p>
+                    The agent team is working through the investigation. Watch the
+                    console on the left for status updates.
                   </p>
                 </div>
-
-
               </div>
             )}
 
             {/* 4. Complete final view */}
             {(status === "completed" || (status === "failed" && draftReport)) && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "30px" }}>
-                <div className="glass-panel" style={{ padding: "40px 50px", background: "hsla(220, 12%, 14%, 0.15)" }}>
-                  {renderMarkdownWithCitations(draftReport)}
-                </div>
+              <div className="glass-panel" style={{ padding: "2.5rem 3rem" }}>
+                {renderMarkdownWithCitations(draftReport)}
               </div>
             )}
 
-            {/* 5. Failed without report */}
             {status === "failed" && !draftReport && (
-              <div className="glass-panel" style={{ borderLeft: "4px solid var(--danger)", padding: "30px", textAlign: "center" }}>
-                <h2 style={{ color: "var(--danger)", fontSize: "1.5rem", marginBottom: "10px" }}>Investigation Failed</h2>
-                <p style={{ color: "var(--text-secondary)", marginBottom: "20px" }}>
-                  The agent team encountered a terminal error while executing the graph. Please review the live console logs on the left to diagnose connection or API threshold issues.
+              <div className="glass-panel workspace__alert">
+                <h2>Investigation failed</h2>
+                <p>
+                  The agent team encountered an error. Review the console logs on the
+                  left for details.
                 </p>
-                <button className="form-button" onClick={() => router.push("/")}>
+                <button className="form-button" onClick={() => router.push("/app")}>
                   Return to Dashboard
                 </button>
               </div>
@@ -747,73 +692,34 @@ export default function ResearchWorkspace() {
 
           {/* Source popup panel sidebar */}
           {selectedSource && (
-            <div 
-              style={{
-                position: "absolute",
-                top: 0,
-                right: 0,
-                bottom: 0,
-                width: "400px",
-                background: "hsl(220, 15%, 8%)",
-                borderLeft: "1px solid var(--border-color)",
-                boxShadow: "-8px 0 32px rgba(0, 0, 0, 0.6)",
-                padding: "30px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "20px",
-                zIndex: 20,
-                overflowY: "auto",
-                animation: "slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards"
-              }}
-            >
+            <div className="source-panel">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span className="badge badge-completed" style={{ background: "hsla(260, 85%, 60%, 0.12)", color: "hsl(260, 85%, 70%)" }}>
-                  Citation {selectedSource.id}
-                </span>
-                <button 
-                  onClick={() => setSelectedSource(null)}
-                  style={{
-                    background: "transparent",
-                    border: "none",
-                    color: "var(--text-muted)",
-                    fontSize: "1.5rem",
-                    cursor: "pointer"
-                  }}
-                >
+                <span className="badge badge-accent">Citation {selectedSource.id}</span>
+                <button className="source-panel__close" onClick={() => setSelectedSource(null)} aria-label="Close">
                   ×
                 </button>
               </div>
-              
+
               <div>
-                <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "8px" }}>
+                <h3 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: "0.5rem" }}>
                   {selectedSource.title}
                 </h3>
-                <a 
-                  href={selectedSource.url} 
-                  target="_blank" 
+                <a
+                  href={selectedSource.url}
+                  target="_blank"
                   rel="noreferrer"
-                  style={{ 
-                    fontSize: "0.85rem", 
-                    color: "var(--primary-accent)", 
-                    wordBreak: "break-all",
-                    display: "inline-block",
-                    marginBottom: "16px"
-                  }}
+                  className="source-panel__url"
                 >
-                  🔗 {selectedSource.url}
+                  {selectedSource.url}
                 </a>
               </div>
 
-              <div style={{ flex: 1, borderTop: "1px solid var(--border-color)", paddingTop: "16px" }}>
-                <h4 style={{ fontSize: "0.9rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.02em", marginBottom: "8px" }}>
-                  Retrieved Passage Snippet
-                </h4>
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.6, background: "hsla(220, 15%, 4%, 0.5)", padding: "16px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
+              <div style={{ flex: 1, borderTop: "1px solid var(--border-color)", paddingTop: "1rem" }}>
+                <p className="form-label">Retrieved passage</p>
+                <p className="source-panel__snippet">
                   {selectedSource.snippet || "No snippet text recorded."}
                 </p>
               </div>
-
-
             </div>
           )}
 

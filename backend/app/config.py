@@ -23,8 +23,10 @@ class Settings(BaseSettings):
     DATABASE_URL: Optional[str] = None
     REDIS_URL: Optional[str] = None
 
+    # Comma-separated list of allowed browser origins for CORS
+    CORS_ORIGINS: str = "http://localhost:3000"
+
     # Fallback to local SQLite when DATABASE_URL is not set
-    # Using async sqlite driver
     SQLITE_URL: str = f"sqlite+aiosqlite:///{BASE_DIR}/deep_research.db"
 
     model_config = SettingsConfigDict(
@@ -51,6 +53,10 @@ class Settings(BaseSettings):
     @property
     def is_redis(self) -> bool:
         return bool(self.REDIS_URL)
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
 
 # Instantiate settings
 settings = Settings()
