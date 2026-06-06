@@ -1,4 +1,4 @@
-import MagneticButton from "./MagneticButton";
+import Link from "next/link";
 
 const LINKS = [
   { label: "How it works", href: "#how-it-works" },
@@ -20,9 +20,9 @@ export default function FloatingNav() {
           ))}
         </div>
 
-        <MagneticButton href="/app" className="landing-nav__cta">
+        <Link href="/app" className="landing-btn landing-btn--primary landing-nav__cta">
           Launch App
-        </MagneticButton>
+        </Link>
       </div>
     </nav>
   );
