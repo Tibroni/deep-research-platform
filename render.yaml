@@ -22,11 +22,4 @@ services:
         sync: false
       - key: CORS_ORIGINS
         sync: false
-      - key: DATABASE_URL
-        fromDatabase:
-          name: deep-research-db
-          property: connectionString
-
-databases:
-  - name: deep-research-db
-    plan: free
+      # Leave DATABASE_URL unset — app uses local SQLite (fine for demos)
