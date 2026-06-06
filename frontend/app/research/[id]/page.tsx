@@ -75,7 +75,7 @@ export default function ResearchWorkspace() {
   useEffect(() => {
     fetchJobDetails();
 
-    const ws = new WebSocket(`${WS_BASE}/research/${id}`);
+    const ws = new WebSocket(`${WS_BASE}/ws/research/${id}`);
     
     ws.onopen = () => {
       setConnected(true);
